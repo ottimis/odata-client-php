@@ -3,6 +3,8 @@
 namespace SaintSystems\OData;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use Psr\Http\Message\ResponseInterface;
 
 class GuzzleHttpProvider implements IHttpProvider
 {
@@ -11,23 +13,23 @@ class GuzzleHttpProvider implements IHttpProvider
     *
     * @var Client
     */
-    protected $http;
+    protected Client $http;
 
     /**
     * The timeout, in seconds
     *
     * @var string
     */
-    protected $timeout;
+    protected string $timeout;
 
-    protected $extra_options;
+    protected array $extra_options;
 
     /**
      * Creates a new HttpProvider
      *
      * @param array $config
      */
-    public function __construct($config = [])
+    public function __construct(array $config = [])
     {
         $this->http = new Client($config);
         $this->timeout = 0;
@@ -38,7 +40,7 @@ class GuzzleHttpProvider implements IHttpProvider
      * Gets the timeout limit of the cURL request
      * @return integer  The timeout in ms
      */
-    public function getTimeout()
+    public function getTimeout(): int
     {
         return $this->timeout;
     }
@@ -50,7 +52,7 @@ class GuzzleHttpProvider implements IHttpProvider
      *
      * @return $this
      */
-    public function setTimeout($timeout)
+    public function setTimeout($timeout): static
     {
         $this->timeout = $timeout;
         return $this;
@@ -61,25 +63,26 @@ class GuzzleHttpProvider implements IHttpProvider
      *
      * @param array $config
      */
-    public function configureDefaults($config)
+    public function configureDefaults($config): void
     {
         $this->http->configureDefaults($config);
     }
 
-    public function setExtraOptions($options)
+    public function setExtraOptions($options): void
     {
         $this->extra_options = $options;
     }
 
     /**
-    * Executes the HTTP request using Guzzle
-    *
-    * @param HttpRequestMessage $request
-    *
-    * @return mixed object or array of objects
-    *         of class $returnType
-    */
-    public function send(HttpRequestMessage $request)
+     * Executes the HTTP request using Guzzle
+     *
+     * @param HttpRequestMessage $request
+     *
+     * @return ResponseInterface object or array of objects
+     *         of class $returnType
+     * @throws GuzzleException
+     */
+    public function send(HttpRequestMessage $request): ResponseInterface
     {
         $options = [
             'headers' => $request->headers,

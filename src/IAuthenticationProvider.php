@@ -12,5 +12,5 @@ interface IAuthenticationProvider
      * @param  HttpRequestMessage $request The HttpRequestMessage to authenticate.
      * @return void
      */
-    public function authenticateRequest(HttpRequestMessage $request);
+    public function authenticateRequest(HttpRequestMessage $request): void;
 }

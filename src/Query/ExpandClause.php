@@ -11,14 +11,14 @@ class ExpandClause extends Builder
      *
      * @var string
      */
-    public $property;
+    public string $property;
 
     /**
      * The parent query builder instance.
      *
      * @var Builder
      */
-    private $parentQuery;
+    private Builder $parentQuery;
 
     /**
      * Create a new expand clause instance.
@@ -49,15 +49,15 @@ class ExpandClause extends Builder
      * on `contacts`.`user_id` = `users`.`id`  and `contacts`.`info_id` = `info`.`id`
      *
      * @param \Closure|string $first
-     * @param string|null     $operator
-     * @param string|null     $second
-     * @param string          $boolean
+     * @param string|null $operator
+     * @param string|null $second
+     * @param string $boolean
      *
      * @return $this
      *
      * @throws \InvalidArgumentException
      */
-    public function on($first, $operator = null, $second = null, $boolean = 'and')
+    public function on(Closure|string $first, ?string $operator = null, ?string $second = null, string $boolean = 'and'): static
     {
         if ($first instanceof Closure) {
             return $this->whereNested($first, $boolean);
@@ -70,12 +70,12 @@ class ExpandClause extends Builder
      * Add an "or on" clause to the join.
      *
      * @param \Closure|string $first
-     * @param string|null     $operator
-     * @param string|null     $second
+     * @param string|null $operator
+     * @param string|null $second
      *
      * @return ExpandClause
      */
-    public function orOn($first, $operator = null, $second = null)
+    public function orOn(Closure|string $first, ?string $operator = null, ?string $second = null): static
     {
         return $this->on($first, $operator, $second, 'or');
     }
@@ -85,7 +85,7 @@ class ExpandClause extends Builder
      *
      * @return ExpandClause
      */
-    public function newQuery()
+    public function newQuery(): static
     {
         return new static($this->parentQuery, $this->property);
     }

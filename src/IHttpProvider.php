@@ -15,7 +15,7 @@ interface IHttpProvider
      *
      * @return mixed object or array of objects
      */
-    public function send(HttpRequestMessage $request);
+    public function send(HttpRequestMessage $request): mixed;
 
     /// <summary>
     /// Sends the request.

@@ -10,9 +10,9 @@ interface IProcessor
      * Process the results of a "select" query.
      *
      * @param Builder       $query
-     * @param IODataRequest $results
+     * @param array|string $results
      *
-     * @return IODataRequest
+     * @return array|string
      */
-    public function processSelect(Builder $query, $results);
+    public function processSelect(Builder $query, array|string $results): array|string;
 }

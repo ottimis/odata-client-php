@@ -51,7 +51,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @var string
      */
-    protected $primaryKey = 'id';
+    protected string $primaryKey = 'id';
 
     /**
      * The "type" of the entity key.
@@ -62,14 +62,14 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * @var array
      */
-    private static $globalScopes;
+    private static array $globalScopes;
 
     /**
      * The number of entities to return for pagination.
      *
      * @var int
      */
-    protected $perPage = 25;
+    protected int $perPage = 25;
 
     /**
      * The array of properties available
@@ -77,115 +77,115 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @var array(string => string)
      */
-    protected $properties = [];
+    protected array $properties = [];
 
     /**
      * The model property's original state.
      *
      * @var array
      */
-    protected $original = [];
+    protected array $original = [];
 
     /**
      * The loaded relationships for the model.
      *
      * @var array
      */
-    protected $relations = [];
+    protected array $relations = [];
 
     /**
      * The properties that should be hidden for arrays.
      *
      * @var array
      */
-    protected $hidden = [];
+    protected array $hidden = [];
 
     /**
      * The properties that should be visible in arrays.
      *
      * @var array
      */
-    protected $visible = [];
+    protected array $visible = [];
 
     /**
      * The accessors to append to the model's array form.
      *
      * @var array
      */
-    protected $appends = [];
+    protected array $appends = [];
 
     /**
      * The properties that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [];
+    protected array $fillable = [];
 
     /**
      * The properties that aren't mass assignable.
      *
      * @var array
      */
-    protected $guarded = []; //['*'];
+    protected array $guarded = []; //['*'];
 
     /**
      * The properties that should be mutated to dates.
      *
      * @var array
      */
-    protected $dates = [];
+    protected array $dates = [];
 
     /**
      * The storage format of the model's date columns.
      *
      * @var string
      */
-    protected $dateFormat;
+    protected string $dateFormat;
 
     /**
      * The properties that should be cast to native types.
      *
      * @var array
      */
-    protected $casts = [];
+    protected array $casts = [];
 
     /**
      * The relations to eager load on every call.
      *
      * @var array
      */
-    protected $with = [];
+    protected array $with = [];
 
     /**
      * The array of booted entities.
      *
      * @var array
      */
-    protected static $booted = [];
+    protected static array $booted = [];
 
     /**
      * Indicates if all mass assignment is enabled.
      *
      * @var bool
      */
-    protected static $unguarded = false;
+    protected static bool $unguarded = false;
 
     /**
      * The cache of the mutated properties for each class.
      *
      * @var array
      */
-    protected static $mutatorCache = [];
+    protected static array $mutatorCache = [];
 
     /**
      * @var bool
      */
-    private $exists;
+    private bool $exists;
 
     /**
      * @var string
      */
-    private $entity;
+    private string $entity;
 
     /**
      * Construct a new Entity
@@ -194,7 +194,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return Entity
      */
-    function __construct($properties = array())
+    function __construct(array $properties = array())
     {
         $this->bootIfNotBooted();
 
@@ -210,7 +210,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return void
      */
-    protected function bootIfNotBooted()
+    protected function bootIfNotBooted(): void
     {
         if (!isset(static::$booted[static::class])) {
             static::$booted[static::class] = true;
@@ -228,7 +228,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return void
      */
-    protected static function boot()
+    protected static function boot(): void
     {
         static::bootTraits();
     }
@@ -238,7 +238,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return void
      */
-    protected static function bootTraits()
+    protected static function bootTraits(): void
     {
         $class = static::class;
 
@@ -254,7 +254,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return void
      */
-    public static function clearBootedModels()
+    public static function clearBootedModels(): void
     {
         static::$booted = [];
         static::$globalScopes = [];
@@ -268,7 +268,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @throws MassAssignmentException
      */
-    public function fill(array $properties)
+    public function fill(array $properties): static
     {
         $totallyGuarded = $this->totallyGuarded();
 
@@ -294,7 +294,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  array  $properties
      * @return $this
      */
-    public function forceFill(array $properties)
+    public function forceFill(array $properties): static
     {
         return static::unguarded(function () use ($properties) {
             return $this->fill($properties);
@@ -307,7 +307,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  array  $properties
      * @return array
      */
-    protected function fillableFromArray(array $properties)
+    protected function fillableFromArray(array $properties): array
     {
         if (count($this->getFillable()) > 0 && !static::$unguarded) {
             return array_intersect_key($properties, array_flip($this->getFillable()));
@@ -323,7 +323,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  bool  $exists
      * @return static
      */
-    public function newInstance($properties = [], $exists = false)
+    public function newInstance($properties = [], $exists = false): static
     {
         // This method just provides a convenient way for us to generate fresh model
         // instances of this current model. It is particularly useful during the
@@ -340,7 +340,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return string
      */
-    public function getEntity()
+    public function getEntity(): string
     {
         if (isset($this->entity)) {
             return $this->entity;
@@ -356,7 +356,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return $this
      */
-    public function setEntity($entity)
+    public function setEntity(string $entity): static
     {
         $this->entity = $entity;
 
@@ -368,7 +368,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return mixed
      */
-    public function getKey()
+    public function getKey(): mixed
     {
         return $this->getAttribute($this->getKeyName());
     }
@@ -378,7 +378,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return string
      */
-    public function getKeyName()
+    public function getKeyName(): string
     {
         return $this->primaryKey;
     }
@@ -386,10 +386,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Set the primary key for the entity.
      *
-     * @param  string  $key
+     * @param string $key
      * @return $this
      */
-    public function setKeyName($key)
+    public function setKeyName(string $key): static
     {
         $this->primaryKey = $key;
 
@@ -401,7 +401,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return int
      */
-    public function getPerPage()
+    public function getPerPage(): int
     {
         return $this->perPage;
     }
@@ -409,10 +409,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Set the number of entities to return per page.
      *
-     * @param  int  $perPage
+     * @param int $perPage
      * @return $this
      */
-    public function setPerPage($perPage)
+    public function setPerPage(int $perPage): static
     {
         $this->perPage = $perPage;
 
@@ -424,7 +424,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return array
      */
-    public function getHidden()
+    public function getHidden(): array
     {
         return $this->hidden;
     }
@@ -435,7 +435,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  array  $hidden
      * @return $this
      */
-    public function setHidden(array $hidden)
+    public function setHidden(array $hidden): static
     {
         $this->hidden = $hidden;
 
@@ -445,10 +445,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Add hidden properties for the model.
      *
-     * @param  array|string|null  $properties
+     * @param array|string|null $properties
      * @return void
      */
-    public function addHidden($properties = null)
+    public function addHidden(array|string|null $properties = null): void
     {
         $properties = is_array($properties) ? $properties : func_get_args();
 
@@ -458,10 +458,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Make the given, typically hidden, properties visible.
      *
-     * @param  array|string  $properties
+     * @param array|string $properties
      * @return $this
      */
-    public function makeVisible($properties)
+    public function makeVisible(array|string $properties): static
     {
         $this->hidden = array_diff($this->hidden, (array) $properties);
 
@@ -475,10 +475,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Make the given, typically visible, properties hidden.
      *
-     * @param  array|string  $properties
+     * @param array|string $properties
      * @return $this
      */
-    public function makeHidden($properties)
+    public function makeHidden(array|string $properties): static
     {
         $properties = (array) $properties;
 
@@ -494,7 +494,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return array
      */
-    public function getVisible()
+    public function getVisible(): array
     {
         return $this->visible;
     }
@@ -505,7 +505,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  array  $visible
      * @return $this
      */
-    public function setVisible(array $visible)
+    public function setVisible(array $visible): static
     {
         $this->visible = $visible;
 
@@ -515,10 +515,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Add visible properties for the model.
      *
-     * @param  array|string|null  $properties
+     * @param array|string|null $properties
      * @return void
      */
-    public function addVisible($properties = null)
+    public function addVisible(array|string|null $properties = null): void
     {
         $properties = is_array($properties) ? $properties : func_get_args();
 
@@ -531,7 +531,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  array  $appends
      * @return $this
      */
-    public function setAppends(array $appends)
+    public function setAppends(array $appends): static
     {
         $this->appends = $appends;
 
@@ -543,7 +543,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return array
      */
-    public function getMutatedProperties()
+    public function getMutatedProperties(): array
     {
         $class = static::class;
 
@@ -557,10 +557,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Extract and cache all the mutated properties of a class.
      *
-     * @param  string  $class
+     * @param string $class
      * @return void
      */
-    public static function cacheMutatedProperties($class)
+    public static function cacheMutatedProperties(string $class): void
     {
         static::$mutatorCache[$class] = collect(static::getMutatorMethods($class))->map(function ($match) {
             return lcfirst(static::$snakePropreties ? Str::snake($match) : $match);
@@ -573,7 +573,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  mixed  $class
      * @return array
      */
-    protected static function getMutatorMethods($class)
+    protected static function getMutatorMethods(mixed $class): array
     {
         preg_match_all('/(?<=^|;)get([^;]+?)Property(;|$)/', implode(';', get_class_methods($class)), $matches);
 
@@ -585,7 +585,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return array
      */
-    public function getFillable()
+    public function getFillable(): array
     {
         return $this->fillable;
     }
@@ -596,7 +596,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  array  $fillable
      * @return $this
      */
-    public function fillable(array $fillable)
+    public function fillable(array $fillable): static
     {
         $this->fillable = $fillable;
 
@@ -608,7 +608,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return array
      */
-    public function getGuarded()
+    public function getGuarded(): array
     {
         return $this->guarded;
     }
@@ -619,7 +619,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  array  $guarded
      * @return $this
      */
-    public function guard(array $guarded)
+    public function guard(array $guarded): static
     {
         $this->guarded = $guarded;
 
@@ -629,10 +629,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Disable all mass assignable restrictions.
      *
-     * @param  bool  $state
+     * @param bool $state
      * @return void
      */
-    public static function unguard($state = true)
+    public static function unguard(bool $state = true): void
     {
         static::$unguarded = $state;
     }
@@ -642,7 +642,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return void
      */
-    public static function reguard()
+    public static function reguard(): void
     {
         static::$unguarded = false;
     }
@@ -652,7 +652,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return bool
      */
-    public static function isUnguarded()
+    public static function isUnguarded(): bool
     {
         return static::$unguarded;
     }
@@ -663,7 +663,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  callable  $callback
      * @return mixed
      */
-    public static function unguarded(callable $callback)
+    public static function unguarded(callable $callback): mixed
     {
         if (static::$unguarded) {
             return $callback();
@@ -681,10 +681,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Determine if the given attribute may be mass assigned.
      *
-     * @param  string  $key
+     * @param string $key
      * @return bool
      */
-    public function isFillable($key)
+    public function isFillable(string $key): bool
     {
         if (static::$unguarded) {
             return true;
@@ -707,10 +707,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Determine if the given key is guarded.
      *
-     * @param  string  $key
+     * @param string $key
      * @return bool
      */
-    public function isGuarded($key)
+    public function isGuarded(string $key): bool
     {
         return in_array($key, $this->getGuarded()) || $this->getGuarded() == ['*'];
     }
@@ -720,7 +720,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return bool
      */
-    public function totallyGuarded()
+    public function totallyGuarded(): bool
     {
         return count($this->getFillable()) == 0 && $this->getGuarded() == ['*'];
     }
@@ -730,7 +730,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return array The list of properties
      */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }
@@ -739,10 +739,10 @@ class Entity implements ArrayAccess, Arrayable
      * Set the array of entity properties. No checking is done.
      *
      * @param  array  $properties
-     * @param  bool  $sync
+     * @param bool $sync
      * @return $this
      */
-    public function setRawProperties(array $properties, $sync = false)
+    public function setRawProperties(array $properties, bool $sync = false): static
     {
         $this->properties = $properties;
 
@@ -756,11 +756,11 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Get the entity's original property values.
      *
-     * @param  string|null  $key
-     * @param  mixed  $default
+     * @param string|null $key
+     * @param mixed|null $default
      * @return mixed|array
      */
-    public function getOriginal($key = null, $default = null)
+    public function getOriginal(?string $key = null, mixed $default = null): mixed
     {
         return Arr::get($this->original, $key, $default);
     }
@@ -770,7 +770,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return $this
      */
-    public function syncOriginal()
+    public function syncOriginal(): static
     {
         $this->original = $this->properties;
 
@@ -780,10 +780,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Sync a single original property with its current value.
      *
-     * @param  string  $property
+     * @param string $property
      * @return $this
      */
-    public function syncOriginalProperty($property)
+    public function syncOriginalProperty(string $property): static
     {
         $this->original[$property] = $this->properties[$property];
 
@@ -793,10 +793,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Dynamically retrieve properties on the entity.
      *
-     * @param  string  $key
+     * @param string $key
      * @return mixed
      */
-    public function __get($key)
+    public function __get(string $key)
     {
         return $this->getProperty($key);
     }
@@ -804,11 +804,11 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Dynamically set properties on the entity.
      *
-     * @param  string  $key
+     * @param string $key
      * @param  mixed  $value
      * @return void
      */
-    public function __set($key, $value)
+    public function __set(string $key, mixed $value)
     {
         $this->setProperty($key, $value);
     }
@@ -819,7 +819,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  mixed  $offset
      * @return bool
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return isset($this->$offset);
     }
@@ -831,7 +831,7 @@ class Entity implements ArrayAccess, Arrayable
      * @return mixed
      */
     #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->$offset;
     }
@@ -843,7 +843,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  mixed  $value
      * @return void
      */
-    public function offsetSet($offset, $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->$offset = $value;
     }
@@ -854,7 +854,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  mixed  $offset
      * @return void
      */
-    public function offsetUnset($offset): void
+    public function offsetUnset(mixed $offset): void
     {
         unset($this->$offset);
     }
@@ -862,10 +862,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Determine if a property or relation exists on the model.
      *
-     * @param  string  $key
+     * @param string $key
      * @return bool
      */
-    public function __isset($key)
+    public function __isset(string $key)
     {
         return !is_null($this->getProperty($key));
     }
@@ -873,10 +873,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Unset a property on the model.
      *
-     * @param  string  $key
+     * @param string $key
      * @return void
      */
-    public function __unset($key)
+    public function __unset(string $key)
     {
         unset($this->properties[$key], $this->relations[$key]);
     }
@@ -884,11 +884,11 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Determine whether a property should be cast to a native type.
      *
-     * @param  string  $key
-     * @param  array|string|null  $types
+     * @param string $key
+     * @param array|string|null $types
      * @return bool
      */
-    public function hasCast($key, $types = null)
+    public function hasCast(string $key, array|string|null $types = null): bool
     {
         if (array_key_exists($key, $this->getCasts())) {
             return $types ? in_array($this->getCastType($key), (array) $types, true) : true;
@@ -902,7 +902,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return array
      */
-    public function getCasts()
+    public function getCasts(): array
     {
         // if ($this->getIncrementing()) {
         //     return array_merge([
@@ -916,10 +916,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Determine whether a value is Date / DateTime castable for inbound manipulation.
      *
-     * @param  string  $key
+     * @param string $key
      * @return bool
      */
-    protected function isDateCastable($key)
+    protected function isDateCastable(string $key): bool
     {
         return $this->hasCast($key, ['date', 'datetime']);
     }
@@ -927,10 +927,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Determine whether a value is JSON castable for inbound manipulation.
      *
-     * @param  string  $key
+     * @param string $key
      * @return bool
      */
-    protected function isJsonCastable($key)
+    protected function isJsonCastable(string $key): bool
     {
         return $this->hasCast($key, ['array', 'json', 'object', 'collection']);
     }
@@ -938,10 +938,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Get the type of cast for a entity property.
      *
-     * @param  string  $key
+     * @param string $key
      * @return string
      */
-    protected function getCastType($key)
+    protected function getCastType(string $key): string
     {
         return trim(strtolower($this->getCasts()[$key]));
     }
@@ -949,11 +949,11 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Cast a property to a native PHP type.
      *
-     * @param  string  $key
+     * @param string $key
      * @param  mixed  $value
      * @return mixed
      */
-    protected function castProperty($key, $value)
+    protected function castProperty(string $key, mixed $value): mixed
     {
         if (is_null($value)) {
             return $value;
@@ -996,11 +996,11 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Set a given property on the entity.
      *
-     * @param  string  $key
+     * @param string $key
      * @param  mixed  $value
      * @return $this
      */
-    public function setProperty($key, $value)
+    public function setProperty(string $key, mixed $value): static
     {
         // First we will check for the presence of a mutator for the set operation
         // which simply lets the developers tweak the property as it is set on
@@ -1037,10 +1037,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Determine if a set mutator exists for a property.
      *
-     * @param  string  $key
+     * @param string $key
      * @return bool
      */
-    public function hasSetMutator($key)
+    public function hasSetMutator(string $key): bool
     {
         return method_exists($this, 'set' . Str::studly($key) . 'Property');
     }
@@ -1050,7 +1050,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return array
      */
-    public function getDates()
+    public function getDates(): array
     {
         // $defaults = [static::CREATED_AT, static::UPDATED_AT];
 
@@ -1064,7 +1064,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  mixed  $value
      * @return \Illuminate\Support\Carbon
      */
-    protected function asDate($value)
+    protected function asDate(mixed $value): \Illuminate\Support\Carbon
     {
         return $this->asDateTime($value)->startOfDay();
     }
@@ -1075,7 +1075,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  mixed  $value
      * @return \Illuminate\Support\Carbon
      */
-    protected function asDateTime($value)
+    protected function asDateTime(mixed $value): \Illuminate\Support\Carbon
     {
         // If this value is already a Carbon instance, we shall just return it as is.
         // This prevents us having to re-instantiate a Carbon instance when we know
@@ -1118,10 +1118,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Determine if the given value is a standard date format.
      *
-     * @param  string  $value
+     * @param string $value
      * @return bool
      */
-    protected function isStandardDateFormat($value)
+    protected function isStandardDateFormat(string $value): bool
     {
         return preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $value);
     }
@@ -1132,7 +1132,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  mixed  $value
      * @return string|null
      */
-    public function fromDateTime($value)
+    public function fromDateTime(mixed $value): ?string
     {
         return empty($value) ? $value : $this->asDateTime($value)->format(
             $this->getDateFormat()
@@ -1145,7 +1145,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  mixed  $value
      * @return int
      */
-    protected function asTimeStamp($value)
+    protected function asTimeStamp(mixed $value): int
     {
         return $this->asDateTime($value)->getTimestamp();
     }
@@ -1156,7 +1156,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  \DateTimeInterface  $date
      * @return string
      */
-    protected function serializeDate(DateTimeInterface $date)
+    protected function serializeDate(DateTimeInterface $date): string
     {
         return $date->format($this->getDateFormat());
     }
@@ -1166,7 +1166,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return string
      */
-    protected function getDateFormat()
+    protected function getDateFormat(): string
     {
         return $this->dateFormat; // ?: $this->getConnection()->getQueryGrammar()->getDateFormat();
     }
@@ -1174,10 +1174,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Set the date format used by the model.
      *
-     * @param  string  $format
+     * @param string $format
      * @return $this
      */
-    public function setDateFormat($format)
+    public function setDateFormat(string $format): static
     {
         $this->dateFormat = $format;
 
@@ -1190,7 +1190,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  mixed  $value
      * @return string
      */
-    protected function asJson($value)
+    protected function asJson(mixed $value): string
     {
         return json_encode($value);
     }
@@ -1198,11 +1198,11 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Decode the given JSON back into an array or object.
      *
-     * @param  string  $value
-     * @param  bool  $asObject
+     * @param string $value
+     * @param bool $asObject
      * @return mixed
      */
-    public function fromJson($value, $asObject = false)
+    public function fromJson(string $value, bool $asObject = false): mixed
     {
         return json_decode($value, !$asObject);
     }
@@ -1213,7 +1213,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  mixed  $value
      * @return mixed
      */
-    public function fromFloat($value)
+    public function fromFloat(mixed $value): mixed
     {
         switch ((string) $value) {
             case 'Infinity':
@@ -1230,11 +1230,11 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Return a decimal as string.
      *
-     * @param  float  $value
-     * @param  int  $decimals
+     * @param float $value
+     * @param int $decimals
      * @return string
      */
-    protected function asDecimal($value, $decimals)
+    protected function asDecimal(float $value, int $decimals): string
     {
         return number_format($value, $decimals, '.', '');
     }
@@ -1242,10 +1242,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Convert the model instance to JSON.
      *
-     * @param  int  $options
+     * @param int $options
      * @return string
      */
-    public function toJson($options = 0)
+    public function toJson(int $options = 0): string
     {
         return json_encode($this->jsonSerialize(), $options);
     }
@@ -1255,7 +1255,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return array
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->toArray();
     }
@@ -1265,7 +1265,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return array_merge($this->propertiesToArray(), $this->relationsToArray());
     }
@@ -1275,7 +1275,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return array
      */
-    public function propertiesToArray()
+    public function propertiesToArray(): array
     {
         // If a property is a date, we will cast it to a string after converting it
         // to a DateTime / Carbon instance. This is so we will get some consistent
@@ -1313,7 +1313,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  array  $properties
      * @return array
      */
-    protected function addDatePropertiesToArray(array $properties)
+    protected function addDatePropertiesToArray(array $properties): array
     {
         foreach ($this->getDates() as $key) {
             if (!isset($properties[$key])) {
@@ -1335,7 +1335,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  array  $mutatedProperties
      * @return array
      */
-    protected function addMutatedPropertiesToArray(array $properties, array $mutatedProperties)
+    protected function addMutatedPropertiesToArray(array $properties, array $mutatedProperties): array
     {
         foreach ($mutatedProperties as $key) {
             // We want to spin through all the mutated properties for this model and call
@@ -1364,7 +1364,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  array  $mutatedProperties
      * @return array
      */
-    protected function addCastPropertiesToArray(array $properties, array $mutatedProperties)
+    protected function addCastPropertiesToArray(array $properties, array $mutatedProperties): array
     {
         foreach ($this->getCasts() as $key => $value) {
             if (!array_key_exists($key, $properties) || in_array($key, $mutatedProperties)) {
@@ -1398,7 +1398,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return array
      */
-    protected function getArrayableProperties()
+    protected function getArrayableProperties(): array
     {
         return $this->getArrayableItems($this->properties);
     }
@@ -1408,7 +1408,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return array
      */
-    protected function getArrayableAppends()
+    protected function getArrayableAppends(): array
     {
         if (!count($this->appends)) {
             return [];
@@ -1424,7 +1424,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return array
      */
-    public function relationsToArray()
+    public function relationsToArray(): array
     {
         $properties = [];
 
@@ -1468,7 +1468,7 @@ class Entity implements ArrayAccess, Arrayable
      *
      * @return array
      */
-    protected function getArrayableRelations()
+    protected function getArrayableRelations(): array
     {
         return $this->getArrayableItems($this->relations);
     }
@@ -1479,7 +1479,7 @@ class Entity implements ArrayAccess, Arrayable
      * @param  array  $values
      * @return array
      */
-    protected function getArrayableItems(array $values)
+    protected function getArrayableItems(array $values): array
     {
         if (count($this->getVisible()) > 0) {
             $values = array_intersect_key($values, array_flip($this->getVisible()));
@@ -1498,10 +1498,10 @@ class Entity implements ArrayAccess, Arrayable
      * @param  string  $key
      * @return mixed
      */
-    public function getProperty($key)
+    public function getProperty($key): mixed
     {
         if (!$key) {
-            return;
+            return null;
         }
 
         if ($key === 'id') {
@@ -1522,7 +1522,7 @@ class Entity implements ArrayAccess, Arrayable
         // since we don't want to treat any of those methods as relationships because
         // they are all intended as helper methods and none of these are relations.
         if (method_exists(self::class, $key)) {
-            return;
+            return null;
         }
 
         // return $this->getRelationValue($key);
@@ -1532,10 +1532,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Get a plain property (not a relationship).
      *
-     * @param  string  $key
+     * @param string $key
      * @return mixed
      */
-    public function getPropertyValue($key)
+    public function getPropertyValue(string $key): mixed
     {
         $value = $this->getPropertyFromArray($key);
 
@@ -1569,10 +1569,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Get a property from the $properties array.
      *
-     * @param  string  $key
+     * @param string $key
      * @return mixed
      */
-    protected function getPropertyFromArray($key)
+    protected function getPropertyFromArray(string $key): mixed
     {
         if (isset($this->properties[$key])) {
             return $this->properties[$key];
@@ -1582,10 +1582,10 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Determine if a get mutator exists for a property.
      *
-     * @param  string  $key
+     * @param string $key
      * @return bool
      */
-    public function hasGetMutator($key)
+    public function hasGetMutator(string $key): bool
     {
         return method_exists($this, 'get' . Str::studly($key) . 'Property');
         //return method_exists($this, 'get_'.$key);
@@ -1594,11 +1594,11 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Get the value of a property using its mutator.
      *
-     * @param  string  $key
+     * @param string $key
      * @param  mixed  $value
      * @return mixed
      */
-    protected function mutateProperty($key, $value)
+    protected function mutateProperty(string $key, mixed $value): mixed
     {
         return $this->{'get' . Str::studly($key) . 'Property'}($value);
         // return $this->{'get_'.$key}($value);
@@ -1607,11 +1607,11 @@ class Entity implements ArrayAccess, Arrayable
     /**
      * Get the value of a property using its mutator for array conversion.
      *
-     * @param  string  $key
+     * @param string $key
      * @param  mixed  $value
      * @return mixed
      */
-    protected function mutatePropertyForArray($key, $value)
+    protected function mutatePropertyForArray(string $key, mixed $value): mixed
     {
         $value = $this->mutateProperty($key, $value);
 

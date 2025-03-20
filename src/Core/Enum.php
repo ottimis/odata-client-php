@@ -26,13 +26,13 @@ use SaintSystems\OData\Exception\ApplicationException;
  */
 abstract class Enum
 {
-    private static $constants = [];
+    private static array $constants = [];
     /**
     * The value of the enum
     *
     * @var string
     */
-    private $_value;
+    private string $_value;
 
     /**
      * Create a new enum
@@ -41,7 +41,7 @@ abstract class Enum
      *
      * @throws ApplicationException
      */
-    public function __construct($value)
+    public function __construct(string $value)
     {
         if (!self::has($value)) {
             throw new ApplicationException("Invalid enum value $value");
@@ -55,7 +55,7 @@ abstract class Enum
      * @param string $value
      * @return bool the enum has the value
      */
-    public function has($value)
+    public function has(string $value): bool
     {
         return in_array($value, self::toArray(), true);
     }
@@ -67,7 +67,7 @@ abstract class Enum
     *
     * @return bool True if the value is defined
     */
-    public function is($value)
+    public function is(string $value): bool
     {
         return $this->_value === $value;
     }
@@ -77,7 +77,7 @@ abstract class Enum
      *
      * @return mixed
      */
-    public function toArray()
+    public function toArray(): mixed
     {
         $class = get_called_class();
 
@@ -94,7 +94,7 @@ abstract class Enum
     *
     * @return string value of the enum
     */
-    public function value()
+    public function value(): string
     {
         return $this->_value;
     }

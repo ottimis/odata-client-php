@@ -57,7 +57,7 @@ if (!function_exists('http_build_url')) {
      *                       composed url like parse_url() would return
      * @return string
      */
-    function http_build_url($url, $parts = array(), $flags = HTTP_URL_REPLACE, &$new_url = array())
+    function http_build_url(mixed $url, mixed $parts = array(), int $flags = HTTP_URL_REPLACE, array &$new_url = array()): string
     {
         is_array($url) || $url = parse_url($url);
         is_array($parts) || $parts = parse_url($parts);
@@ -174,7 +174,7 @@ if (!function_exists('http_build_url')) {
 }
 
 if (!function_exists('is_uuid')) {
-    function is_uuid($uuid)
+    function is_uuid($uuid): bool
     {
         return preg_match('/^[a-f0-9]{8}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{12}$/i', $uuid) == 1;
     }

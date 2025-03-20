@@ -20,14 +20,14 @@ interface IODataClient
      *
      * @return IODataClient
      */
-    public function setPageSize($pageSize);
+    public function setPageSize(int $pageSize): IODataClient;
 
     /**
      * Gets the page size
      *
-     * @return int
+     * @return ?int
      */
-    public function getPageSize();
+    public function getPageSize(): ?int;
 
     /**
      * Set the entityKey to be found.
@@ -36,26 +36,26 @@ interface IODataClient
      *
      * @return IODataClient
      */
-    public function setEntityKey($entityKey);
+    public function setEntityKey(mixed $entityKey): IODataClient;
 
     /**
      * Gets the entity key
      *
      * @return mixed
      */
-    public function getEntityKey();
+    public function getEntityKey(): mixed;
 
     /**
      * Gets the base URL for requests of the client.
-     * @var string
+     * @return string
      */
-    public function getBaseUrl();
+    public function getBaseUrl(): string;
 
     /**
      * Gets the IHttpProvider for sending HTTP requests.
-     * @var IHttpProvider
+     * @return IHttpProvider
      */
-    public function getHttpProvider();
+    public function getHttpProvider(): IHttpProvider;
 
     /**
      * Begin a fluent query against an OData service
@@ -64,7 +64,7 @@ interface IODataClient
      *
      * @return \SaintSystems\OData\Query\Builder
      */
-    public function from($entitySet);
+    public function from(string $entitySet): Query\Builder;
 
     /**
      * Begin a fluent query against an odata service
@@ -73,14 +73,14 @@ interface IODataClient
      *
      * @return \SaintSystems\OData\Query\Builder
      */
-    public function select($properties = []);
+    public function select(array $properties = []): Query\Builder;
 
     /**
      * Get a new query builder instance.
      *
      * @return \SaintSystems\OData\Query\Builder
      */
-    public function query();
+    public function query(): Query\Builder;
 
     /**
      * Run a GET HTTP request against the service.
@@ -88,9 +88,9 @@ interface IODataClient
      * @param $requestUri
      * @param array $bindings
      *
-     * @return IODataRequest
+     * @return array|string
      */
-    public function get($requestUri, $bindings = []);
+    public function get($requestUri, array $bindings = []): array|string;
 
     /**
      * Run a GET HTTP request against the service.
@@ -98,9 +98,9 @@ interface IODataClient
      * @param $requestUri
      * @param array $bindings
      *
-     * @return IODataRequest
+     * @return IODataRequest|array
      */
-    public function getNextPage($requestUri, $bindings = []);
+    public function getNextPage($requestUri, array $bindings = []): IODataRequest|array;
 
     /**
      * Run a GET HTTP request against the service and return a generator
@@ -108,16 +108,16 @@ interface IODataClient
      * @param $requestUri
      * @param array $bindings
      *
-     * @return IODataRequest
+     * @return \Illuminate\Support\LazyCollection
      */
-    public function cursor($requestUri, $bindings = []);
+    public function cursor($requestUri, array $bindings = []): \Illuminate\Support\LazyCollection;
 
     /**
      * Get the query grammar used by the connection.
      *
      * @return IGrammar
      */
-    public function getQueryGrammar();
+    public function getQueryGrammar(): IGrammar;
 
     /**
      * Set the query grammar used by the connection.
@@ -126,14 +126,14 @@ interface IODataClient
      *
      * @return void
      */
-    public function setQueryGrammar(IGrammar $grammar);
+    public function setQueryGrammar(IGrammar $grammar): void;
 
     /**
      * Get the query post processor used by the connection.
      *
      * @return IProcessor
      */
-    public function getPostProcessor();
+    public function getPostProcessor(): IProcessor;
 
     /**
      * Set the query post processor used by the connection.
@@ -142,5 +142,5 @@ interface IODataClient
      *
      * @return void
      */
-    public function setPostProcessor(IProcessor $processor);
+    public function setPostProcessor(IProcessor $processor): void;
 }

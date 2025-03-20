@@ -17,65 +17,66 @@ class ODataClient implements IODataClient
      * The base service URL. For example, "https://services.odata.org/V4/TripPinService/"
      * @var string
      */
-    private $baseUrl;
+    private string $baseUrl;
 
     /**
      * The IAuthenticationProvider for authenticating request messages.
-     * @var IAuthenticationProvider
+     * @var IAuthenticationProvider|Closure|null
      */
-    private $authenticationProvider;
+    private IAuthenticationProvider|Closure|null $authenticationProvider;
 
     /**
      * The IHttpProvider for sending HTTP requests.
      * @var IHttpProvider
      */
-    private $httpProvider;
+    private IHttpProvider $httpProvider;
 
     /**
      * The query grammar implementation.
      *
      * @var IGrammar
      */
-    protected $queryGrammar;
+    protected IGrammar $queryGrammar;
 
     /**
      * The query post processor implementation.
      *
      * @var IProcessor
      */
-    protected $postProcessor;
+    protected IProcessor $postProcessor;
 
     /**
      * The return type for the entities
      *
-     * @var string
+     * @var ?string
      */
-    private $entityReturnType;
+    private ?string $entityReturnType = null;
 
     /**
      * The page size
      *
-     * @var int
+     * @var ?int
      */
-    private $pageSize;
+    private ?int $pageSize = null;
 
     /**
      * The entityKey to be found
      *
      * @var mixed
      */
-    private $entityKey;
+    private mixed $entityKey = null;
 
     /**
      * Constructs a new ODataClient.
-     * @param string                  $baseUrl                The base service URL.
-     * @param IAuthenticationProvider $authenticationProvider The IAuthenticationProvider for authenticating request messages.
-     * @param IHttpProvider|null      $httpProvider           The IHttpProvider for sending requests.
+     * @param string $baseUrl The base service URL.
+     * @param callable|null $authenticationProvider The IAuthenticationProvider for authenticating request messages.
+     * @param IHttpProvider|null $httpProvider The IHttpProvider for sending requests.
+     * @throws ODataException
      */
     public function __construct(
-        $baseUrl,
-        Callable $authenticationProvider = null,
-        IHttpProvider $httpProvider = null
+        string         $baseUrl,
+        ?Callable      $authenticationProvider = null,
+        ?IHttpProvider $httpProvider = null
     ) {
         $this->setBaseUrl($baseUrl);
         $this->authenticationProvider = $authenticationProvider;
@@ -94,7 +95,7 @@ class ODataClient implements IODataClient
      *
      * @return void
      */
-    public function useDefaultQueryGrammar()
+    public function useDefaultQueryGrammar(): void
     {
         $this->queryGrammar = $this->getDefaultQueryGrammar();
     }
@@ -104,7 +105,7 @@ class ODataClient implements IODataClient
      *
      * @return IGrammar
      */
-    protected function getDefaultQueryGrammar()
+    protected function getDefaultQueryGrammar(): IGrammar
     {
         return new Grammar;
     }
@@ -114,7 +115,7 @@ class ODataClient implements IODataClient
      *
      * @return void
      */
-    public function useDefaultPostProcessor()
+    public function useDefaultPostProcessor(): void
     {
         $this->postProcessor = $this->getDefaultPostProcessor();
     }
@@ -124,7 +125,7 @@ class ODataClient implements IODataClient
      *
      * @return IProcessor
      */
-    protected function getDefaultPostProcessor()
+    protected function getDefaultPostProcessor(): IProcessor
     {
         return new Processor();
     }
@@ -132,9 +133,9 @@ class ODataClient implements IODataClient
     /**
      * Gets the IAuthenticationProvider for authenticating requests.
      *
-     * @return Closure|IAuthenticationProvider
+     * @return Closure|IAuthenticationProvider|null
      */
-    public function getAuthenticationProvider()
+    public function getAuthenticationProvider(): IAuthenticationProvider|Closure|null
     {
         return $this->authenticationProvider;
     }
@@ -144,7 +145,7 @@ class ODataClient implements IODataClient
      *
      * @return string
      */
-    public function getBaseUrl()
+    public function getBaseUrl(): string
     {
         return $this->baseUrl;
     }
@@ -155,7 +156,7 @@ class ODataClient implements IODataClient
      *
      * @throws ODataException
      */
-    public function setBaseUrl($value)
+    public function setBaseUrl(mixed $value): void
     {
         if (empty($value)) {
             throw new ODataException(Constants::BASE_URL_MISSING);
@@ -169,7 +170,7 @@ class ODataClient implements IODataClient
      *
      * @return IHttpProvider
      */
-    public function getHttpProvider()
+    public function getHttpProvider(): IHttpProvider
     {
         return $this->httpProvider;
     }
@@ -181,7 +182,7 @@ class ODataClient implements IODataClient
      *
      * @return Builder
      */
-    public function from($entitySet)
+    public function from(string $entitySet): Builder
     {
         return $this->query()->from($entitySet);
     }
@@ -193,7 +194,7 @@ class ODataClient implements IODataClient
      *
      * @return Builder
      */
-    public function select($properties = [])
+    public function select(array $properties = []): Builder
     {
         $properties = is_array($properties) ? $properties : func_get_args();
 
@@ -205,7 +206,7 @@ class ODataClient implements IODataClient
      *
      * @return Builder
      */
-    public function query()
+    public function query(): Builder
     {
         return new Builder(
             $this, $this->getQueryGrammar(), $this->getPostProcessor()
@@ -216,11 +217,11 @@ class ODataClient implements IODataClient
      * Run a GET HTTP request against the service.
      *
      * @param string $requestUri
-     * @param array  $bindings
+     * @param array $bindings
      *
-     * @return IODataRequest
+     * @return array|string
      */
-    public function get($requestUri, $bindings = [])
+    public function get($requestUri, array $bindings = []): array|string
     {
         list($response, $nextPage) = $this->getNextPage($requestUri, $bindings);
         return $response;
@@ -230,11 +231,11 @@ class ODataClient implements IODataClient
      * Run a GET HTTP request against the service.
      *
      * @param string $requestUri
-     * @param array  $bindings
+     * @param array $bindings
      *
-     * @return IODataRequest
+     * @return array
      */
-    public function getNextPage($requestUri, $bindings = [])
+    public function getNextPage($requestUri, array $bindings = []): array
     {
         return $this->request(HttpMethod::GET, $requestUri, $bindings);
     }
@@ -243,11 +244,11 @@ class ODataClient implements IODataClient
      * Run a GET HTTP request against the service and return a generator.
      *
      * @param string $requestUri
-     * @param array  $bindings
+     * @param array $bindings
      *
      * @return \Illuminate\Support\LazyCollection
      */
-    public function cursor($requestUri, $bindings = [])
+    public function cursor($requestUri, array $bindings = []): \Illuminate\Support\LazyCollection
     {
         return LazyCollection::make(function() use($requestUri, $bindings) {
 
@@ -271,9 +272,9 @@ class ODataClient implements IODataClient
      * @param string $requestUri
      * @param mixed  $postData
      *
-     * @return IODataRequest
+     * @return array
      */
-    public function post($requestUri, $postData)
+    public function post(string $requestUri, mixed $postData): array
     {
         return $this->request(HttpMethod::POST, $requestUri, $postData);
     }
@@ -284,9 +285,9 @@ class ODataClient implements IODataClient
      * @param string $requestUri
      * @param mixed  $body
      *
-     * @return IODataRequest
+     * @return array
      */
-    public function patch($requestUri, $body)
+    public function patch(string $requestUri, mixed $body): array
     {
         return $this->request(HttpMethod::PATCH, $requestUri, $body);
     }
@@ -296,9 +297,9 @@ class ODataClient implements IODataClient
      *
      * @param string $requestUri
      *
-     * @return IODataRequest
+     * @return array
      */
-    public function delete($requestUri)
+    public function delete(string $requestUri): array
     {
         return $this->request(HttpMethod::DELETE, $requestUri);
     }
@@ -308,13 +309,13 @@ class ODataClient implements IODataClient
      *
      * @param string $method
      * @param string $requestUri
-     * @param mixed  $body
+     * @param mixed|null $body
      *
-     * @return IODataRequest
+     * @return array
      *
      * @throws ODataException
      */
-    public function request($method, $requestUri, $body = null)
+    public function request(string $method, string $requestUri, mixed $body = null): array
     {
         $request = new ODataRequest($method, $this->baseUrl.$requestUri, $this, $this->entityReturnType);
 
@@ -330,7 +331,7 @@ class ODataClient implements IODataClient
      *
      * @return IGrammar
      */
-    public function getQueryGrammar()
+    public function getQueryGrammar(): IGrammar
     {
         return $this->queryGrammar;
     }
@@ -342,7 +343,7 @@ class ODataClient implements IODataClient
      *
      * @return void
      */
-    public function setQueryGrammar(IGrammar $grammar)
+    public function setQueryGrammar(IGrammar $grammar): void
     {
         $this->queryGrammar = $grammar;
     }
@@ -352,7 +353,7 @@ class ODataClient implements IODataClient
      *
      * @return IProcessor
      */
-    public function getPostProcessor()
+    public function getPostProcessor(): IProcessor
     {
         return $this->postProcessor;
     }
@@ -364,7 +365,7 @@ class ODataClient implements IODataClient
      *
      * @return void
      */
-    public function setPostProcessor(IProcessor $processor)
+    public function setPostProcessor(IProcessor $processor): void
     {
         $this->postProcessor = $processor;
     }
@@ -374,7 +375,7 @@ class ODataClient implements IODataClient
      *
      * @param string $entityReturnType
      */
-    public function setEntityReturnType($entityReturnType)
+    public function setEntityReturnType(string $entityReturnType): void
     {
         $this->entityReturnType = $entityReturnType;
     }
@@ -386,7 +387,8 @@ class ODataClient implements IODataClient
      *
      * @return IODataClient
      */
-    public function setPageSize($pageSize) {
+    public function setPageSize(int $pageSize): IODataClient
+    {
         $this->pageSize = $pageSize;
         return $this;
     }
@@ -394,9 +396,10 @@ class ODataClient implements IODataClient
     /**
      * Gets the page size
      *
-     * @return int
+     * @return ?int
      */
-    public function getPageSize() {
+    public function getPageSize(): ?int
+    {
         return $this->pageSize;
     }
 
@@ -407,7 +410,8 @@ class ODataClient implements IODataClient
      *
      * @return IODataClient
      */
-    public function setEntityKey($entityKey) {
+    public function setEntityKey(mixed $entityKey): IODataClient
+    {
         $this->entityKey = $entityKey;
         return $this;
     }
@@ -417,7 +421,8 @@ class ODataClient implements IODataClient
      *
      * @return mixed
      */
-    public function getEntityKey() {
+    public function getEntityKey(): mixed
+    {
         return $this->entityKey;
     }
 }

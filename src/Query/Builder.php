@@ -18,26 +18,26 @@ class Builder
      * Gets the IODataClient for handling requests.
      * @var IODataClient
      */
-    public $client;
+    public IODataClient $client;
 
     /**
      * Gets the URL for the built request, without query string.
      * @var string
      */
-    public $requestUrl;
+    public string $requestUrl;
 
     /**
      * Gets the URL for the built request, without query string.
      * @var object
      */
-    public $returnType;
+    public object $returnType;
 
     /**
      * The current query value bindings.
      *
      * @var array
      */
-    public $bindings = [
+    public array $bindings = [
         'select' => [],
         'where'  => [],
         'order'  => [],
@@ -48,28 +48,28 @@ class Builder
      *
      * @var string
      */
-    public $entitySet;
+    public string $entitySet;
 
     /**
      * The entity key of the entity set which the query is targeting.
      *
-     * @var string
+     * @var string|int|array|null
      */
-    public $entityKey;
+    public string|int|array|null $entityKey = null;
 
     /**
      * The placeholder property for the ? operator in the OData querystring
      *
      * @var string
      */
-    public $queryString = '?';
+    public string $queryString = '?';
 
     /**
      * An aggregate function to be run.
      *
-     * @var boolean
+     * @var ?boolean
      */
-    public $count;
+    public ?bool $count = null;
 
     /**
      * Whether to include a total count of items matching
@@ -77,71 +77,71 @@ class Builder
      *
      * @var boolean
      */
-    public $totalCount;
+    public bool $totalCount;
 
     /**
      * The specific set of properties to return for this entity or complex type
      * http://docs.oasis-open.org/odata/odata/v4.0/errata03/os/complete/part2-url-conventions/odata-v4.0-errata03-os-part2-url-conventions-complete.html#_Toc453752360
      *
-     * @var array
+     * @var ?array
      */
-    public $properties;
+    public ?array $properties = null;
 
     /**
      * The where constraints for the query.
      *
      * @var array
      */
-    public $wheres;
+    public array $wheres;
 
     /**
      * The groupings for the query.
      *
      * @var array
      */
-    public $groups;
+    public array $groups;
 
     /**
      * The orderings for the query.
      *
      * @var array
      */
-    public $orders;
+    public array $orders;
 
     /**
      * The maximum number of records to return.
      *
      * @var int
      */
-    public $take;
+    public int $take;
 
     /**
      * The desired page size.
      *
      * @var int
      */
-    public $pageSize;
+    public int $pageSize;
 
     /**
      * The number of records to skip.
      *
      * @var int
      */
-    public $skip;
+    public int $skip;
 
     /**
      * The skiptoken.
      *
      * @var int
      */
-    public $skiptoken;
+    public int $skiptoken;
 
     /**
      * All of the available clause operators.
      *
      * @var array
      */
-    public $operators = [
+    public array $operators = [
         '=', '<', '>', '<=', '>=', '<>', '!=',
         'like', 'like binary', 'not like', 'between', 'ilike',
         '&', '|', '^', '<<', '>>',
@@ -153,34 +153,34 @@ class Builder
     /**
      * @var array
      */
-    public $select = [];
+    public array $select = [];
 
     /**
      * @var array
      */
-    public $expands;
+    public array $expands;
 
     /**
      * @var IProcessor
      */
-    private $processor;
+    private IProcessor $processor;
 
     /**
      * @var IGrammar
      */
-    private $grammar;
+    private IGrammar $grammar;
 
     /**
      * Create a new query builder instance.
      *
      * @param IODataClient $client
-     * @param IGrammar     $grammar
-     * @param IProcessor   $processor
+     * @param IGrammar|null $grammar
+     * @param IProcessor|null $processor
      */
     public function __construct(
         IODataClient $client,
-        IGrammar $grammar = null,
-        IProcessor $processor = null
+        ?IGrammar $grammar = null,
+        ?IProcessor $processor = null
     ) {
         $this->client = $client;
         $this->grammar = $grammar ?: $client->getQueryGrammar();
@@ -194,7 +194,7 @@ class Builder
      *
      * @return $this
      */
-    public function select($properties = [])
+    public function select(mixed $properties = []): static
     {
         $this->properties = is_array($properties) ? $properties : func_get_args();
 
@@ -208,7 +208,7 @@ class Builder
      *
      * @return $this
      */
-    public function addSelect($select)
+    public function addSelect(mixed $select): static
     {
         $select = is_array($select) ? $select : func_get_args();
 
@@ -224,7 +224,7 @@ class Builder
      *
      * @return $this
      */
-    public function from($entitySet)
+    public function from(string $entitySet): static
     {
         $this->entitySet = $entitySet;
 
@@ -234,11 +234,11 @@ class Builder
     /**
      * Filter the entity set on the primary key.
      *
-     * @param string $id
+     * @param string|array|int $id
      *
      * @return $this
      */
-    public function whereKey($id)
+    public function whereKey(string|array|int $id): static
     {
         $this->entityKey = $id;
         $this->client->setEntityKey($this->entityKey);
@@ -248,10 +248,10 @@ class Builder
     /**
      * Add an $expand clause to the query.
      *
-     * @param array $properties
+     * @param array|string $properties
      * @return $this
      */
-    public function expand($properties = [])
+    public function expand(array|string $properties = []): static
     {
         $this->expands = is_array($properties) ? $properties : func_get_args();
 
@@ -295,13 +295,13 @@ class Builder
     /**
      * Apply the callback's query changes if the given "value" is true.
      *
-     * @param bool     $value
+     * @param bool $value
      * @param \Closure $callback
-     * @param \Closure $default
+     * @param \Closure|null $default
      *
      * @return Builder
      */
-    public function when($value, $callback, $default = null)
+    public function when(bool $value, Closure $callback, ?Closure $default = null): Builder|static
     {
         $builder = $this;
 
@@ -317,11 +317,11 @@ class Builder
     /**
      * Set the properties to be ordered.
      *
-     * @param  array|mixed  $properties
+     * @param mixed|array $properties
      *
      * @return $this
      */
-    public function order($properties = [])
+    public function order(mixed $properties = []): static
     {
         $order = is_array($properties) && count(func_get_args()) === 1 ? $properties : func_get_args();
 
@@ -341,7 +341,7 @@ class Builder
      *
      * @return $this
      */
-    public function orderBySQL($sql = '')
+    public function orderBySQL(string $sql = ''): static
     {
         $this->orders = array(['sql' => $sql]);
 
@@ -355,13 +355,13 @@ class Builder
      *
      * @return array
      */
-    private function buildOrders($orders = [])
+    private function buildOrders(array $orders = []): array
     {
         $_orders = [];
 
         foreach ($orders as &$order) {
-            $column = isset($order['column']) ? $order['column'] : $order[0];
-            $direction = isset($order['direction']) ? $order['direction'] : (isset($order[1]) ? $order[1] : 'asc');
+            $column = $order['column'] ?? $order[0];
+            $direction = $order['direction'] ?? ($order[1] ?? 'asc');
 
             array_push($_orders, [
                 'column' => $column,
@@ -375,11 +375,11 @@ class Builder
     /**
      * Merge an array of where clauses and bindings.
      *
-     * @param  array  $wheres
-     * @param  array  $bindings
+     * @param array $wheres
+     * @param array $bindings
      * @return void
      */
-    public function mergeWheres($wheres, $bindings)
+    public function mergeWheres(array $wheres, array $bindings): void
     {
         $this->wheres = array_merge((array) $this->wheres, (array) $wheres);
 
@@ -391,14 +391,14 @@ class Builder
     /**
      * Add a basic where ($filter) clause to the query.
      *
-     * @param string|array|\Closure $column
-     * @param string                $operator
-     * @param mixed                 $value
-     * @param string                $boolean
+     * @param array|string|\Closure $column
+     * @param string|int|null $operator
+     * @param mixed $value
+     * @param string|null $boolean
      *
      * @return $this
      */
-    public function where($column, $operator = null, $value = null, $boolean = 'and')
+    public function where(array|string|Closure $column, string|int|null $operator = null, mixed $value = null, ?string $boolean = 'and'): Builder|static
     {
         // If the column is an array, we will assume it is an array of key-value pairs
         // and can add them each as a where clause. We will maintain the boolean we
@@ -471,13 +471,13 @@ class Builder
     /**
      * Add an array of where clauses to the query.
      *
-     * @param array  $column
+     * @param array $column
      * @param string $boolean
      * @param string $method
      *
      * @return $this
      */
-    protected function addArrayOfWheres($column, $boolean, $method = 'where')
+    protected function addArrayOfWheres(array $column, string $boolean, string $method = 'where'): Builder|static
     {
         return $this->whereNested(function ($query) use ($column, $method) {
             foreach ($column as $key => $value) {
@@ -493,10 +493,10 @@ class Builder
     /**
      * Determine if the given operator is actually a function.
      *
-     * @param  string $operator
+     * @param string $operator
      * @return bool
      */
-    protected function isOperatorAFunction($operator)
+    protected function isOperatorAFunction(string $operator): bool
     {
         return in_array(strtolower($operator), $this->grammar->getFunctions(), true);
     }
@@ -504,15 +504,15 @@ class Builder
     /**
      * Prepare the value and operator for a where clause.
      *
-     * @param string $value
-     * @param string $operator
-     * @param bool   $useDefault
+     * @param ?string $value
+     * @param string|int|null $operator
+     * @param bool $useDefault
      *
      * @return array
      *
      * @throws \InvalidArgumentException
      */
-    protected function prepareValueAndOperator($value, $operator, $useDefault = false)
+    protected function prepareValueAndOperator(?string $value, string|int|null $operator, bool $useDefault = false): array
     {
         if ($useDefault) {
             return [$operator, '='];
@@ -528,12 +528,12 @@ class Builder
      *
      * Prevents using Null values with invalid operators.
      *
-     * @param string $operator
+     * @param ?string $operator
      * @param mixed  $value
      *
      * @return bool
      */
-    protected function invalidOperatorAndValue($operator, $value)
+    protected function invalidOperatorAndValue(?string $operator, mixed $value): bool
     {
         return is_null($value) && in_array($operator, $this->operators) &&
              ! in_array($operator, ['=', '<>', '!=']);
@@ -542,10 +542,10 @@ class Builder
     /**
      * Determine if the given operator is supported.
      *
-     * @param  string $operator
+     * @param ?string $operator
      * @return bool
      */
-    protected function invalidOperator($operator)
+    protected function invalidOperator(?string $operator): bool
     {
         return ! in_array(strtolower($operator), $this->operators, true) &&
                ! in_array(strtolower($operator), $this->grammar->getOperatorsAndFunctions(), true);
@@ -554,18 +554,18 @@ class Builder
     /**
      * Add an "or where" clause to the query.
      *
-     * @param  \Closure|string $column
-     * @param  string          $operator
-     * @param  mixed           $value
+     * @param \Closure|string|array $column
+     * @param string|null $operator
+     * @param mixed|null $value
      *
      * @return Builder|static
      */
-    public function orWhere($column, $operator = null, $value = null)
+    public function orWhere(Closure|string|array $column, ?string $operator = null, mixed $value = null): Builder|static
     {
         return $this->where($column, $operator, $value, 'or');
     }
 
-    public function whereRaw($rawString, $boolean = 'and')
+    public function whereRaw($rawString, $boolean = 'and'): static
     {
         // We will add this where clause into this array of clauses that we
         // are building for the query. All of them will be compiled via a grammar
@@ -579,7 +579,7 @@ class Builder
         return $this;
     }
 
-    public function orWhereRaw($rawString)
+    public function orWhereRaw($rawString): static
     {
         return $this->whereRaw($rawString, 'or');
     }
@@ -587,13 +587,13 @@ class Builder
     /**
      * Add a "where" clause comparing two columns to the query.
      *
-     * @param  string|array $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @param  string|null  $boolean
+     * @param array|string $first
+     * @param string|null $operator
+     * @param string|null $second
+     * @param string $boolean
      * @return $this
      */
-    public function whereColumn($first, $operator = null, $second = null, $boolean = 'and')
+    public function whereColumn(array|string $first, ?string $operator = null, ?string $second = null, string $boolean = 'and'): Builder|static
     {
         // If the column is an array, we will assume it is an array of key-value pairs
         // and can add them each as a where clause. We will maintain the boolean we
@@ -631,12 +631,12 @@ class Builder
     /**
      * Add an "or where" clause comparing two columns to the query.
      *
-     * @param  string|array $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
+     * @param array|string $first
+     * @param string|null $operator
+     * @param string|null $second
      * @return $this
      */
-    public function orWhereColumn($first, $operator = null, $second = null)
+    public function orWhereColumn(array|string $first, ?string $operator = null, ?string $second = null): Builder|static
     {
         return $this->whereColumn($first, $operator, $second, 'or');
     }
@@ -645,11 +645,11 @@ class Builder
      * Add a nested where statement to the query.
      *
      * @param \Closure $callback
-     * @param string   $boolean
+     * @param string $boolean
      *
      * @return Builder|static
      */
-    public function whereNested(Closure $callback, $boolean = 'and')
+    public function whereNested(Closure $callback, string $boolean = 'and'): Builder|static
     {
         call_user_func($callback, $query = $this->forNestedWhere());
 
@@ -661,7 +661,7 @@ class Builder
      *
      * @return Builder
      */
-    public function forNestedWhere()
+    public function forNestedWhere(): Builder
     {
         return $this->newQuery()->from($this->entitySet);
     }
@@ -670,11 +670,11 @@ class Builder
      * Add another query builder as a nested where to the query builder.
      *
      * @param Builder|static $query
-     * @param string         $boolean
+     * @param string $boolean
      *
      * @return $this
      */
-    public function addNestedWhereQuery($query, $boolean = 'and')
+    public function addNestedWhereQuery(Builder $query, string $boolean = 'and'): static
     {
         if (count($query->wheres)) {
             $type = 'Nested';
@@ -690,14 +690,14 @@ class Builder
     /**
      * Add a full sub-select to the query.
      *
-     * @param string   $column
-     * @param string   $operator
+     * @param string $column
+     * @param string $operator
      * @param \Closure $callback
-     * @param string   $boolean
+     * @param string $boolean
      *
      * @return $this
      */
-    protected function whereSub($column, $operator, Closure $callback, $boolean)
+    protected function whereSub(string $column, string $operator, Closure $callback, string $boolean): static
     {
         $type = 'Sub';
 
@@ -718,12 +718,12 @@ class Builder
     /**
      * Add a "where null" clause to the query.
      *
-     * @param  string  $column
-     * @param  string  $boolean
-     * @param  bool    $not
+     * @param string $column
+     * @param string $boolean
+     * @param bool $not
      * @return $this
      */
-    public function whereNull($column, $boolean = 'and', $not = false)
+    public function whereNull(string $column, string $boolean = 'and', bool $not = false): static
     {
         $type = $not ? 'NotNull' : 'Null';
 
@@ -735,10 +735,10 @@ class Builder
     /**
      * Add an "or where null" clause to the query.
      *
-     * @param  string  $column
+     * @param string $column
      * @return Builder|static
      */
-    public function orWhereNull($column)
+    public function orWhereNull(string $column): Builder|static
     {
         return $this->whereNull($column, 'or');
     }
@@ -746,11 +746,11 @@ class Builder
     /**
      * Add a "where not null" clause to the query.
      *
-     * @param  string  $column
-     * @param  string  $boolean
+     * @param string $column
+     * @param string $boolean
      * @return Builder|static
      */
-    public function whereNotNull($column, $boolean = 'and')
+    public function whereNotNull(string $column, string $boolean = 'and'): Builder|static
     {
         return $this->whereNull($column, $boolean, true);
     }
@@ -758,10 +758,10 @@ class Builder
     /**
      * Add an "or where not null" clause to the query.
      *
-     * @param  string  $column
+     * @param string $column
      * @return Builder|static
      */
-    public function orWhereNotNull($column)
+    public function orWhereNotNull(string $column): Builder|static
     {
         return $this->whereNotNull($column, 'or');
     }
@@ -772,13 +772,13 @@ class Builder
     /**
      * Add a "where in" clause to the query.
      *
-     * @param  string  $column
-     * @param  array   $list
-     * @param  string  $boolean
-     * @param  bool    $not
+     * @param string $column
+     * @param array $list
+     * @param string $boolean
+     * @param bool $not
      * @return $this
      */
-    public function whereIn($column, $list, $boolean = 'and', $not = false)
+    public function whereIn(string $column, array $list, string $boolean = 'and', bool $not = false): static
     {
         $type = $not ? 'NotIn' : 'In';
 
@@ -790,11 +790,11 @@ class Builder
     /**
      * Add an "or where in" clause to the query.
      *
-     * @param  string  $column
-     * @param  array   $list
+     * @param string $column
+     * @param array $list
      * @return Builder|static
      */
-    public function orWhereIn($column, $list)
+    public function orWhereIn(string $column, array $list): Builder|static
     {
         return $this->whereIn($column, $list, 'or');
     }
@@ -802,12 +802,12 @@ class Builder
     /**
      * Add a "where not in" clause to the query.
      *
-     * @param  string  $column
-     * @param  array   $list
-     * @param  string  $boolean
+     * @param string $column
+     * @param array $list
+     * @param string $boolean
      * @return Builder|static
      */
-    public function whereNotIn($column, $list, $boolean = 'and')
+    public function whereNotIn(string $column, array $list, string $boolean = 'and'): Builder|static
     {
         return $this->whereIn($column, $list, $boolean, true);
     }
@@ -815,11 +815,11 @@ class Builder
     /**
      * Add an "or where not in" clause to the query.
      *
-     * @param  string  $column
-     * @param  array   $list
+     * @param string $column
+     * @param array $list
      * @return Builder|static
      */
-    public function orWhereNotIn($column, $list)
+    public function orWhereNotIn(string $column, array $list): Builder|static
     {
         return $this->whereNotIn($column, $list, 'or');
     }
@@ -831,7 +831,7 @@ class Builder
      *
      * @return string
      */
-    public function toRequest()
+    public function toRequest(): string
     {
         return $this->grammar->compileSelect($this);
     }
@@ -839,14 +839,14 @@ class Builder
     /**
      * Execute a query for a single record by ID. Single and multi-part IDs are supported.
      *
-     * @param int|string|array      $id the value of the ID or an associative array in case of multi-part IDs
-     * @param array                 $properties
+     * @param int|array|string $id the value of the ID or an associative array in case of multi-part IDs
+     * @param array $properties
      *
-     * @return \stdClass|array|null
+     * @return mixed
      *
      * @throws ODataQueryException
      */
-    public function find($id, $properties = [])
+    public function find(int|array|string $id, array $properties = []): mixed
     {
         if (!isset($this->entitySet)) {
             throw new ODataQueryException(Constants::ENTITY_SET_REQUIRED);
@@ -861,7 +861,7 @@ class Builder
      *
      * @return mixed
      */
-    public function value($property)
+    public function value(string $property): mixed
     {
         $result = (array) $this->first([$property]);
 
@@ -873,9 +873,9 @@ class Builder
      *
      * @param array $properties
      *
-     * @return \stdClass|array|null
+     * @return mixed
      */
-    public function first($properties = [])
+    public function first(array $properties = []): mixed
     {
         return $this->take(1)->get($properties)->first();
         //return $this->take(1)->get($properties);
@@ -888,7 +888,7 @@ class Builder
      *
      * @return Builder|static
      */
-    public function skip($value)
+    public function skip(int $value): Builder|static
     {
         $this->skip = $value;
         return $this;
@@ -901,7 +901,7 @@ class Builder
      *
      * @return Builder|static
      */
-    public function skipToken($value)
+    public function skipToken(int $value): Builder|static
     {
         $this->skiptoken = $value;
         return $this;
@@ -914,7 +914,7 @@ class Builder
      *
      * @return Builder|static
      */
-    public function take($value)
+    public function take(int $value): Builder|static
     {
         $this->take = $value;
         return $this;
@@ -927,7 +927,7 @@ class Builder
      *
      * @return Builder|static
      */
-    public function pageSize($value)
+    public function pageSize(int $value): Builder|static
     {
         $this->pageSize = $value;
         $this->client->setPageSize($this->pageSize);
@@ -938,11 +938,11 @@ class Builder
      * Execute the query as a "GET" request.
      *
      * @param array $properties
-     * @param array $options
+     * @param array|null $options
      *
      * @return Collection
      */
-    public function get($properties = [], $options = null)
+    public function get(array $properties = [], ?array $options = null): Collection
     {
         if (is_numeric($properties)) {
             $options = $properties;
@@ -976,11 +976,11 @@ class Builder
      *
      * @param array $body
      * @param array $properties
-     * @param array $options
+     * @param array|null $options
      *
      * @return Collection
      */
-    public function post($body = [], $properties = [], $options = null)
+    public function post(array $body = [], array $properties = [], ?array $options = null): Collection
     {
         if (is_numeric($properties)) {
             $options = $properties;
@@ -1013,7 +1013,7 @@ class Builder
      *
      * @return boolean
      */
-    public function delete($options = null)
+    public function delete($options = null): bool
     {
         $results = $this->processor->processSelect($this, $this->runDelete());
 
@@ -1024,11 +1024,11 @@ class Builder
      * Execute the query as a "PATCH" request.
      *
      * @param array $properties
-     * @param array $options
+     * @param array|null $options
      *
      * @return Collection
      */
-    public function patch($body, $properties = [], $options = null)
+    public function patch($body, array $properties = [], ?array $options = null): Collection
     {
         if (is_numeric($properties)) {
             $options = $properties;
@@ -1060,9 +1060,9 @@ class Builder
     /**
      * Run the query as a "GET" request against the client.
      *
-     * @return IODataRequest
+     * @return array|string
      */
-    protected function runGet()
+    protected function runGet(): array|string
     {
         return $this->client->get(
             $this->grammar->compileSelect($this), $this->getBindings()
@@ -1074,7 +1074,7 @@ class Builder
      *
      * @return \Illuminate\Support\LazyCollection
      */
-    public function cursor()
+    public function cursor(): \Illuminate\Support\LazyCollection
     {
         return new LazyCollection(function() {
             yield from $this->client->cursor(
@@ -1086,9 +1086,9 @@ class Builder
     /**
      * Run the query as a "GET" request against the client.
      *
-     * @return IODataRequest
+     * @return array
      */
-    protected function runPatch($body)
+    protected function runPatch($body): array
     {
         return $this->client->patch(
             $this->grammar->compileSelect($this), $body
@@ -1098,9 +1098,9 @@ class Builder
     /**
      * Run the query as a "GET" request against the client.
      *
-     * @return IODataRequest
+     * @return array
      */
-    protected function runPost($body)
+    protected function runPost($body): array
     {
         return $this->client->post(
             $this->grammar->compileSelect($this), $body
@@ -1110,9 +1110,9 @@ class Builder
     /**
      * Run the query as a "GET" request against the client.
      *
-     * @return IODataRequest
+     * @return array
      */
-    protected function runDelete()
+    protected function runDelete(): array
     {
         return $this->client->delete(
             $this->grammar->compileSelect($this)
@@ -1124,7 +1124,7 @@ class Builder
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         $this->count = true;
         $results = $this->get();
@@ -1133,6 +1133,8 @@ class Builder
             // replace all none numeric characters before casting it as int
             return (int) preg_replace('/[^0-9,.]/', '', $results[0]);
         }
+
+        return 0;
     }
 
     /**
@@ -1140,9 +1142,9 @@ class Builder
      *
      * @param array $values
      *
-     * @return bool
+     * @return array|bool
      */
-    public function insert(array $values)
+    public function insert(array $values): array|bool
     {
         // Since every insert gets treated like a batch insert, we will make sure the
         // bindings are structured in a way that is convenient when building these
@@ -1182,7 +1184,7 @@ class Builder
      *
      * @return mixed
      */
-    public function insertGetId(array $values)
+    public function insertGetId(array $values): mixed
     {
         $results = $this->insert($values);
 
@@ -1194,7 +1196,7 @@ class Builder
      *
      * @return Builder
      */
-    public function newQuery()
+    public function newQuery(): static
     {
         return new static($this->client, $this->grammar, $this->processor);
     }
@@ -1204,7 +1206,7 @@ class Builder
      *
      * @return array
      */
-    public function getBindings()
+    public function getBindings(): array
     {
         return Arr::flatten($this->bindings);
     }
@@ -1216,7 +1218,7 @@ class Builder
      *
      * @return array
      */
-    protected function cleanBindings(array $bindings)
+    protected function cleanBindings(array $bindings): array
     {
         return array_values(array_filter($bindings, function ($binding) {
             return true;//! $binding instanceof Expression;
@@ -1233,7 +1235,7 @@ class Builder
      *
      * @throws \InvalidArgumentException
      */
-    public function addBinding($value, $type = 'where')
+    public function addBinding(mixed $value, string $type = 'where'): static
     {
         if (! array_key_exists($type, $this->bindings)) {
             throw new \InvalidArgumentException("Invalid binding type: {$type}.");
@@ -1253,7 +1255,7 @@ class Builder
      *
      * @return IODataClient
      */
-    public function getClient()
+    public function getClient(): IODataClient
     {
         return $this->client;
     }

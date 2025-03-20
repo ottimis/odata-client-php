@@ -28,11 +28,11 @@ class ODataQueryException extends ODataException
     /**
     * Construct a new ODataQueryException handler
     *
-    * @param string    $message  The error to send
-    * @param int       $code     The error code associated with the error
+    * @param string $message  The error to send
+    * @param int $code     The error code associated with the error
     * @param \Exception $previous The last error sent, defaults to null
     */
-    public function __construct($message, $code = 0, $previous = null)
+    public function __construct(string $message, int $code = 0, $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }

@@ -6,45 +6,45 @@ class HttpRequestMessage
 {
     /**
      * Gets or sets the body of the HTTP message.
-     * @var string
+     * @var mixed
      */
-    public $body;
+    public mixed $body;
 
     /**
      * Gets or sets whether this HTTP message returns a stream
      * @var bool
      */
-    public $returnsStream = false;
+    public bool $returnsStream = false;
 
     /**
      * Gets the collection of HTTP request headers.
      * @var array
      */
-    public $headers;
+    public array $headers;
 
     /**
      * Gets or sets the HTTP method used by the HTTP request message.
-     * @var HttpMethod
+     * @var string|HttpMethod
      */
-    public $method;
+    public string|HttpMethod $method;
 
     /**
      * Gets a set of properties for the HTTP request.
      * @var array
      */
-    public $properties;
+    public array $properties;
 
     /**
      * Gets or sets the Uri used for the HTTP request.
      * @var string
      */
-    public $requestUri;
+    public string $requestUri;
 
     /**
      * Gets or sets the HTTP message version.
      * @var string
      */
-    public $version;
+    public string $version;
 
     public function __construct($method = HttpMethod::GET, $requestUri = null)
     {

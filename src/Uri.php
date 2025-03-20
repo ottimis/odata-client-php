@@ -15,28 +15,28 @@ class Uri
         'fragment'
     ];
 
-    public $scheme;
+    public string $scheme;
 
-    public $host;
+    public string $host;
 
-    public $port;
+    public int $port;
 
-    public $user;
+    public string $user;
 
-    public $pass;
+    public string $pass;
 
-    public $path;
+    public string $path;
 
-    public $query;
+    public string $query;
 
-    public $fragment;
+    public string $fragment;
 
-    private $parsed;
+    private array|false|int|null|string $parsed;
 
     /**
-     * @param string $uri
+     * @param string|null $uri
      */
-    public function __construct($uri = null)
+    public function __construct(?string $uri = null)
     {
         if ($uri == null) return;
         $uriParsed = parse_url($uri);
