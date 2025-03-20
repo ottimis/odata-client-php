@@ -897,11 +897,11 @@ class Builder
     /**
      * Set the "$skiptoken" value of the query.
      *
-     * @param int $value
+     * @param int|string $value
      *
      * @return Builder|static
      */
-    public function skipToken(int $value): Builder|static
+    public function skipToken(int|string $value): Builder|static
     {
         $this->skiptoken = $value;
         return $this;
