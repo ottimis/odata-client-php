@@ -134,7 +134,7 @@ class Builder
      *
      * @var int
      */
-    public int $skiptoken;
+    public int|string $skiptoken;
 
     /**
      * All of the available clause operators.
