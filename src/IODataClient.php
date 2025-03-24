@@ -69,11 +69,11 @@ interface IODataClient
     /**
      * Begin a fluent query against an odata service
      *
-     * @param array $properties
+     * @param mixed $properties
      *
      * @return \SaintSystems\OData\Query\Builder
      */
-    public function select(array $properties = []): Query\Builder;
+    public function select(mixed $properties = []): Query\Builder;
 
     /**
      * Get a new query builder instance.

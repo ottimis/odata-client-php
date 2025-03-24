@@ -38,7 +38,7 @@ class ODataClientTest extends TestCase
     {
         $odataClient = new ODataClient($this->baseUrl);
         $this->assertNotNull($odataClient);
-        $people = $odataClient->select(['FirstName','LastName'])->from('People')->get();
+        $people = $odataClient->select('FirstName','LastName')->from('People')->get();
         $this->assertTrue(is_array($people->toArray()));
     }
 
@@ -128,7 +128,7 @@ class ODataClientTest extends TestCase
             $this->assertEquals($pageSize, $page2results->count());
         }
 
-        $lastPageSize = 4;
+        $lastPageSize = 5;
         if ($page2skiptoken) {
             $page3response = $odataClient->from('People')->skiptoken($page2skiptoken)->get()->first();
             $page3results = collect($page3response->getResponseAsObject(Entity::class));
@@ -157,7 +157,7 @@ class ODataClientTest extends TestCase
 
         $data = $odataClient->from('People')->pageSize($pageSize)->cursor();
 
-        $expectedCount = 20;
+        $expectedCount = 21;
 
         $this->assertEquals($expectedCount, $data->count());
     }
@@ -186,7 +186,7 @@ class ODataClientTest extends TestCase
         $this->assertEquals('russellwhyte', $first->UserName);
     }
 
-    public function testODataClientCursorLastShouldReturnEntityKristaKemp()
+    public function testODataClientCursorLastShouldReturnEntityTestUser()
     {
         $odataClient = new ODataClient($this->baseUrl);
 
@@ -196,7 +196,7 @@ class ODataClientTest extends TestCase
 
         $last = $data->last();
         $this->assertInstanceOf(Entity::class, $last);
-        $this->assertEquals('kristakemp', $last->UserName);
+        $this->assertEquals('TestUser', $last->UserName);
     }
 
     public function testODataClientCursorSkip1FirstShouldReturnEntityScottKetchum()
@@ -273,7 +273,7 @@ class ODataClientTest extends TestCase
         $data = $odataClient->from('People')->pageSize($pageSize)->cursor();
 
         $lastPage = $data->skip(16);
-        $lastPageSize = 4;
+        $lastPageSize = 5;
         $this->assertEquals($lastPageSize, count($lastPage->toArray()));
     }
 
@@ -285,7 +285,7 @@ class ODataClientTest extends TestCase
 
         $data = $odataClient->from('People')->pageSize($pageSize)->cursor();
 
-        $expectedCount = 20;
+        $expectedCount = 21;
         $counter = 0;
 
         $data->each(function ($person) use(&$counter) {

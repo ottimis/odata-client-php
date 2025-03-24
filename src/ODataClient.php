@@ -190,11 +190,11 @@ class ODataClient implements IODataClient
     /**
      * Begin a fluent query against an odata service
      *
-     * @param array $properties
+     * @param mixed $properties
      *
      * @return Builder
      */
-    public function select(array $properties = []): Builder
+    public function select(mixed $properties = []): Builder
     {
         $properties = is_array($properties) ? $properties : func_get_args();
 

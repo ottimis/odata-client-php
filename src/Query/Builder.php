@@ -132,7 +132,7 @@ class Builder
     /**
      * The skiptoken.
      *
-     * @var int
+     * @var int|string
      */
     public int|string $skiptoken;
 
