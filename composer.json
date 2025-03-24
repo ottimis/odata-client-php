@@ -1,6 +1,6 @@
 {
     "name": "saintsystems/odata-client",
-    "version": "0.8.0",
+    "version": "1.0.0",
     "description": "Saint Systems OData Client for PHP",
     "keywords": [
         "odata",
